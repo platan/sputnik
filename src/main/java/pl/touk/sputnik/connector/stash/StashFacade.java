@@ -91,7 +91,7 @@ public class StashFacade implements ConnectorFacade {
             for (pl.touk.sputnik.review.Comment comment : reviewFile.getComments()) {
                 if (noCommentExists(changes, comment)) {
                     ChangeType changeType = getChangeType(changes, comment.getLine());
-                    if (changeType.equals(ChangeType.NONE) && commentOnlyChangedLines) {
+                    if ((changeType.equals(ChangeType.NONE) || changeType.equals(ChangeType.CONTEXT)) && commentOnlyChangedLines) {
                         log.info("Not posting out of context warning: {}", comment.getMessage());
                         continue;
                     }
