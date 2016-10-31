@@ -76,7 +76,7 @@ public class CheckstyleProcessorTest extends TestEnvironment {
         when(fixture).process(review());
 
         then(caughtException()).isInstanceOf(ReviewException.class)
-                .hasMessageStartingWith("IO exception when reading Checkstyle properties");
+                .hasMessage("IO exception when reading Checkstyle properties.");
     }
 
 }
