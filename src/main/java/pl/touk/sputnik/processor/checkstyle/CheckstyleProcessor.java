@@ -19,8 +19,12 @@ import pl.touk.sputnik.review.filter.JavaFilter;
 import pl.touk.sputnik.review.transformer.IOFileTransformer;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
 @AllArgsConstructor
@@ -59,7 +63,7 @@ public class CheckstyleProcessor implements ReviewProcessor {
             Checker checker = new Checker();
             ClassLoader moduleClassLoader = Checker.class.getClassLoader();
             String configurationFile = getConfigurationFilename();
-            Properties properties = System.getProperties();// loadProperties(new File(System.getProperty(CHECKSTYLE_PROPERTIES_FILE)));
+            Properties properties = loadProperties();
             checker.setModuleClassLoader(moduleClassLoader);
             checker.configure(ConfigurationLoader.loadConfiguration(configurationFile, new PropertiesExpander(properties)));
             checker.addListener(auditListener);
@@ -76,6 +80,21 @@ public class CheckstyleProcessor implements ReviewProcessor {
         return configurationFile;
     }
 
-
+    private Properties loadProperties() {
+        String propertiesFile = configuration.getProperty(GeneralOption.CHECKSTYLE_PROPERTIES_FILE);
+        Properties properties;
+        if (isBlank(propertiesFile)) {
+            properties = System.getProperties();
+        } else {
+            log.info("Using Checkstyle properties file {}", propertiesFile);
+            properties = new Properties();
+            try {
+                properties.load(new FileReader(new File(propertiesFile)));
+            } catch (IOException e) {
+                throw new ReviewException("IO exception when reading Checkstyle properties.", e);
+            }
+        }
+        return properties;
+    }
 
 }
